@@ -1,0 +1,99 @@
+<html>
+<head>
+<style>
+body{width:610px;}
+.frmSearch {border: 1px solid #a8d4b1;background-color: #c6f7d0;margin: 2px 0px;padding:40px;border-radius:4px;}
+#files-list{float:left;list-style:none;margin-top:-3px;padding:0;width:190px;position: absolute;}
+#files-list li{padding: 10px; background: #f0f0f0; border-bottom: #bbb9b9 1px solid;}
+#files-list li:hover{background:#ece3d2;cursor: pointer;}
+#search-box{padding: 10px;border: #a8d4b1 1px solid;border-radius:4px;}
+</style>
+</head>
+<body>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery-ui.js"></script>
+<link href="css/jquery-ui.css" rel="stylesheet">
+<h1>Edvenswa file upload</h1>
+	<form id="uploadForm" method="POST" action="http://localhost:8080/file/api/upload" enctype="multipart/form-data">
+    	<input type="file" name="file" id="file"
+    				accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" /><br/>
+    	<br/>
+    	<input type="button" value="Upload" onclick="javascript:uploadFile()"/>
+    </form>
+    <div id="response"></div>
+<br/><br/><br/><br/>
+<h1>Search Uploaded files</h1>
+
+<div class="frmSearch">
+	<input type="text" id="search-box" placeholder="File Name" /><input type="button" value="Download" id="downloadButton" onclick="downloadFile();"></input>
+	<div id="suggesstion-box"></div>
+</div>
+
+</body>
+
+<script type="text/javascript">
+	function uploadFile() {
+		  var xhttp = new XMLHttpRequest();
+		  xhttp.open("POST", "http://localhost:8080/file/api/upload", true);
+		  var formData = new FormData(document.getElementById("uploadForm"));
+		  document.getElementById("response").innerHTML = "Uploading . . ."
+          console.log("XMLHttpRequest created.");
+		  xhttp.send(formData);
+		  xhttp.onreadystatechange = function() {
+			    if (this.readyState == 4 && this.status == 200) {
+			      var data = this.responseText;
+			      document.getElementById("response").innerHTML = data;
+					$("#file").val('');
+			    }
+		  };
+	}
+	function downloadFile() {
+		window.open(
+				  'http://localhost:8080/file/api/downloadFile/'+$("#search-box").val(),
+				  '_blank' //
+				);
+		$("#search-box").val('');
+		$("#downloadButton").hide();
+	}
+	function downloadFile1() {
+		$.ajax({
+			type: "POST",
+			contentType: false,
+            processData: false,
+			url: "file/api/download",
+			data:'fileName='+$("#search-box").val(),
+			xhrFields: {
+                responseType: 'blob'
+            },
+			success: function(response, status, xhr){
+						console.log(xhr);
+					}
+				});
+	}
+
+	$(document).ready(function() {
+		$("#downloadButton").hide();
+		$("#search-box").keyup(function() {
+			$.ajax({
+				type : "POST",
+				url : "file/api/search",
+				data : 'fileName=' + $(this).val(),
+				beforeSend : function() {
+					$("#search-box").css("background", "#FFF no-repeat 165px");
+				},
+				success : function(data) {
+					$("#suggesstion-box").show();
+					$("#suggesstion-box").html(data);
+					$("#search-box").css("background", "#FFF");
+				}
+			});
+		});
+	});
+	//To select country name
+	function selectFileName(fileName) {
+		$("#search-box").val(fileName);
+		$("#suggesstion-box").hide();
+		$("#downloadButton").show();
+	}
+</script>
+</html>

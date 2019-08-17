@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+ 
+    <appender name="Console"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd} | %d{HH:mm:ss.SSS} | %thread | %5p | %logger{25} | %12(ID: %8mdc{id}) | %m%n
+            </Pattern>
+        </layout>
+    </appender>
+     
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="Console" />
+    </root>
+ 
+    <!-- LOG "com.edvenswa*" at TRACE level -->
+    <logger name="com.edvenswa" level="trace" additivity="false">
+        <appender-ref ref="Console" />
+    </logger>
+ 
+</configuration>
